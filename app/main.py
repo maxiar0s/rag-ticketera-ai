@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Security, Depends, status
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
 from app.agent import agent_app  # Importamos nuestro grafo
+from langchain_core.messages import HumanMessage
 
 # --- CONFIGURACIÓN & SEGURIDAD ---
 API_KEY_SECRET = os.getenv("RAG_API_KEY", "dev_secret")
@@ -37,23 +38,24 @@ app = FastAPI(title="Ticketera AI Agent", lifespan=lifespan)
 @app.post("/agent/process", dependencies=[Depends(verify_api_key)])
 async def process_ticket(ticket: TicketRequest):
     """
-    Endpoint principal que invoca a LangGraph.
+    Endpoint corregido para hablar con LangGraph.
     """
-    # Invocamos el grafo
+    # 1. Convertimos el ticket en un Mensaje Humano para el Agente
+    message_content = f"Asunto: {ticket.subject}\nContenido: {ticket.content}"
+    
+    # 2. Preparamos el estado inicial con las llaves EXACTAS que espera agent.py
     inputs = {
-        "ticket_subject": ticket.subject,
-        "ticket_content": ticket.content,
-        "retrieved_docs": [],
-        "final_response": "",
-        "category": ""
+        "messages": [HumanMessage(content=message_content)],
+        "documents": [],
+        "final_response": ""
     }
     
-    # LangGraph ejecuta el flujo
+    # 3. Invocamos el grafo
+    print("🤖 Enviando ticket al cerebro...")
     result = await agent_app.ainvoke(inputs)
     
+    # 4. Devolvemos solo lo que existe en el resultado
     return {
-        "status": "success",
-        "category": result["category"],
         "solution": result["final_response"],
-        "sources": result["retrieved_docs"]
+        "sources": result["documents"]
     }

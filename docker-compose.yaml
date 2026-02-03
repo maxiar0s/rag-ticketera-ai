@@ -1,0 +1,43 @@
+services:
+  vector-db:
+    image: pgvector/pgvector:pg16
+    container_name: rag_vector_db_local
+    # En local, usamos el puerto estándar 5432 para que puedas conectar
+    # herramientas como DBeaver o TablePlus fácilmente.
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=rag_user
+      - POSTGRES_PASSWORD=rag_password_dev
+      - POSTGRES_DB=rag_knowledge_base
+    volumes:
+      - pg_data_local:/var/lib/postgresql/data
+    networks:
+      - rag_net
+
+  backend:
+    # CAMBIO IMPORTANTE:
+    # "build: ." significa "busca el Dockerfile en ESTA misma carpeta"
+    build: .
+    container_name: rag_api_local
+    ports:
+      - "8000:8000"
+    environment:
+      # Conexión interna de Docker
+      - POSTGRES_HOST=vector-db
+      - POSTGRES_USER=rag_user
+      - POSTGRES_PASSWORD=rag_password_dev
+      - POSTGRES_DB=rag_knowledge_base
+      # Clave simple para desarrollo local
+      - RAG_API_KEY=dev_secret
+    depends_on:
+      - vector-db
+    networks:
+      - rag_net
+
+volumes:
+  pg_data_local:
+
+networks:
+  rag_net:
+    driver: bridge
