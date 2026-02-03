@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic
+langgraph
+langchain
+langchain-core
+psycopg[binary,pool]
+pgvector
+python-dotenv
