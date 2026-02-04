@@ -26,10 +26,7 @@ services:
       # Conexión interna de Docker
       - POSTGRES_HOST=vector-db
       - POSTGRES_USER=rag_user
-      - POSTGRES_PASSWORD=rag_password_dev
-      - POSTGRES_DB=rag_knowledge_base
-      # Clave simple para desarrollo local
-      - RAG_API_KEY=dev_secret
+      - POSTGRES_DB=rag_user
     depends_on:
       - vector-db
     networks:

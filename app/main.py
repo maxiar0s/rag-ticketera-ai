@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Security, Depends, status
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
-from app.agent import agent_app  # Importamos nuestro grafo
+from app.agent.graph import graph_app as agent_app
 from langchain_core.messages import HumanMessage
 
 # --- CONFIGURACIÓN & SEGURIDAD ---
