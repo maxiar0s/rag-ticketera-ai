@@ -7,3 +7,4 @@ langchain-core
 psycopg[binary,pool]
 pgvector
 python-dotenv
+langchain-google-genai
