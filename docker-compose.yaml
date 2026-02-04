@@ -3,7 +3,7 @@ services:
     image: pgvector/pgvector:pg16
     container_name: rag_vector_db_local
     ports:
-      - "5433:5432"
+      - "5430:5432"
     environment:
       - POSTGRES_USER=rag_user
       - POSTGRES_PASSWORD=rag_password_dev
