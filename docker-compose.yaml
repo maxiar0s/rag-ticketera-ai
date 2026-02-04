@@ -2,10 +2,8 @@ services:
   vector-db:
     image: pgvector/pgvector:pg16
     container_name: rag_vector_db_local
-    # En local, usamos el puerto estándar 5432 para que puedas conectar
-    # herramientas como DBeaver o TablePlus fácilmente.
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=rag_user
       - POSTGRES_PASSWORD=rag_password_dev
