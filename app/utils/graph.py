@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph, END
-from app.agent.state import AgentState
-from app.agent.nodes import retrieve_node, generate_node
+from app.utils.state import AgentState
+from app.utils.nodes import retrieve_node, generate_node
 
 # Definimos el flujo
 workflow = StateGraph(AgentState)

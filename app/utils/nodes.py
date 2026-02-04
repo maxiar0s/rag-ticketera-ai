@@ -1,7 +1,7 @@
 import os
 from langchain_core.messages import AIMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-from app.agent.state import AgentState
+from app.utils.state import AgentState
 
 # --- CONFIGURACIÓN DEL MODELO ---
 # Usamos Gemini 1.5 Flash. Temperatura 0 para respuestas técnicas y precisas.
