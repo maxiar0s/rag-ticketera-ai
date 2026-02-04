@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Security, Depends, status
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
-from app.agent.graph import graph_app as agent_app
+from app.utils.graph import graph_app as utils_app
 from langchain_core.messages import HumanMessage
 
 # --- CONFIGURACIÓN & SEGURIDAD ---
@@ -43,7 +43,7 @@ async def process_ticket(ticket: TicketRequest):
     # 1. Convertimos el ticket en un Mensaje Humano para el Agente
     message_content = f"Asunto: {ticket.subject}\nContenido: {ticket.content}"
     
-    # 2. Preparamos el estado inicial con las llaves EXACTAS que espera agent.py
+    # 2. Preparamos el estado inicial con las llaves EXACTAS que espera utils.py
     inputs = {
         "messages": [HumanMessage(content=message_content)],
         "documents": [],
@@ -52,7 +52,7 @@ async def process_ticket(ticket: TicketRequest):
     
     # 3. Invocamos el grafo
     print("🤖 Enviando ticket al cerebro...")
-    result = await agent_app.ainvoke(inputs)
+    result = await utils_app.ainvoke(inputs)
     
     # 4. Devolvemos solo lo que existe en el resultado
     return {
