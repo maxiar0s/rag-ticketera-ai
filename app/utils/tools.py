@@ -14,18 +14,18 @@ def consultar_mis_tickets(user_id: int):
         # dictionary=True devuelve resultados como JSONs {'columna': valor}
         cursor = conn.cursor(dictionary=True) 
         
-        # Seleccionamos solo las columnas críticas para la "vista general"
+        # Seleccionamos las columnas correctas basándonos en el esquema de "Tickets"
         query = """
         SELECT 
             id, 
-            subject, 
-            status, 
-            priority, 
-            created_at
-        FROM tickets 
-        WHERE assignee_id = %s 
-        AND status IN ('OPEN', 'IN_PROGRESS', 'WAITING_CLIENT')
-        ORDER BY priority DESC, created_at ASC;
+            titulo as subject, 
+            estadoTicket as status, 
+            prioridad as priority, 
+            createdAt as created_at
+        FROM Tickets 
+        WHERE tecnicoAsignadoId = %s 
+        AND estadoTicket IN ('Nuevo', 'En Progreso', 'Pendiente')
+        ORDER BY prioridad DESC, createdAt ASC;
         """
         
         cursor.execute(query, (user_id,))
