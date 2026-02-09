@@ -29,7 +29,7 @@ def generate_node(state: AgentState):
     """
     Genera respuesta usando Gemini 2.5 Flash + Contexto
     """
-    print("--- 🧠 NODE: GENERATE (GEMINI) ---")
+    print("--- 🧠 NODE: GENERATE (GEMINI) ---", flush=True)
     
     # 1. Preparamos el contexto
     docs_text = "\n".join(state['documents'])
@@ -39,10 +39,11 @@ def generate_node(state: AgentState):
     system_prompt = SystemMessage(content=f"""
     Eres un Agente de Soporte Técnico experto y empático.
     Usa el siguiente contexto recuperado para responder al usuario.
-    Si la respuesta no está en el contexto, di que necesitas escalar el ticket.
-    
     CONTEXTO TÉCNICO:
     {docs_text}
+    
+    Si la pregunta del usuario requiere información personal, estado de tickets o datos en tiempo real, 
+    tú debes usar la herramienta para hacer consultas sql.
     """)
     
     # 3. Invocamos a Gemini (System Prompt + Historial de conversación)

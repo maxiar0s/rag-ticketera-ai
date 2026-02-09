@@ -14,8 +14,6 @@ services:
       - rag_net
 
   backend:
-    # CAMBIO IMPORTANTE:
-    # "build: ." significa "busca el Dockerfile en ESTA misma carpeta"
     build: .
     container_name: rag_api_local
     ports:
@@ -23,14 +21,21 @@ services:
     env_file:
       - .env
     environment:
+      # 1. ESTA LÍNEA TE DEJA VER LOS LOGS
+      - PYTHONUNBUFFERED=1
       # Conexión interna de Docker
       - POSTGRES_HOST=vector-db
       - POSTGRES_USER=rag_user
-      - POSTGRES_DB=rag_user
+      # 2. CORREGIDO: Debe coincidir con la DB del servicio vector-db
+      - POSTGRES_DB=rag_knowledge_base
     depends_on:
       - vector-db
     networks:
       - rag_net
+    # 3. VOLUMEN DE DESARROLLO (Espejo):
+    # Esto hace que tus cambios en VS Code se reflejen adentro sin rebuild
+    volumes:
+      - .:/code
 
 volumes:
   pg_data_local:
