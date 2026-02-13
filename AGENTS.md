@@ -12,6 +12,7 @@ Operational guidance for coding agents working in `rag-ticketera-ai`.
 
 ## 2) Key paths
 - `app/main.py`: FastAPI app, auth, `/agent/process`, startup schema check
+- `app/main.py`: FastAPI app, auth, `/agent/process`, `/kb/sync`, startup schema check
 - `app/agent/graph.py`: graph wiring (`retriever -> generator -> tools -> generator`)
 - `app/agent/state.py`: `AgentState` contract
 - `app/agent/nodes/`: retrieval + generation nodes and LLM fallback config
@@ -34,6 +35,7 @@ pip install pytest httpx flake8
 ```
 Core env vars:
 - Auth: `RAG_API_KEY`
+- Webhook sync: `RAG_SYNC_WEBHOOK_SECRET` (fallback: `RAG_API_KEY`)
 - Retrieval: `RAG_VECTOR_ENABLED`, `RAG_TOP_K`, `RAG_SCORE_THRESHOLD`
 - Embeddings: `RAG_EMBED_PROVIDER`, `RAG_EMBED_PROVIDER_ORDER`, provider API keys
 - LLM fallback: `LLM_PROVIDER_ORDER`, provider model/env vars + API keys
@@ -165,4 +167,3 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | After creating/modifying a skill | `skill-sync` |
 | Regenerate AGENTS.md Auto-invoke tables (sync.sh) | `skill-sync` |
 | Troubleshoot why a skill is missing from AGENTS.md auto-invoke | `skill-sync` |
-
