@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Security, Depends, status
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
-from app.utils.graph import graph_app as utils_app
+from app.agent.graph import graph_app as utils_app
 from langchain_core.messages import HumanMessage
-from app.utils.vector_store import VectorStore
+from app.infrastructure.vector_store import VectorStore
 
 # --- CONFIGURACIÓN & SEGURIDAD ---
 API_KEY_SECRET = os.getenv("RAG_API_KEY", "dev_secret")

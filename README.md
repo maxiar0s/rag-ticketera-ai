@@ -2,6 +2,14 @@
 
 Microservicio FastAPI con LangGraph para respuestas de soporte y consulta de tickets.
 
+## Estructura de carpetas
+
+- `app/agent/`: Orquestacion del agente (grafo, estado, tools, nodos).
+- `app/infrastructure/`: Integraciones de infraestructura (MySQL, pgvector, embeddings).
+- `app/indexing/`: Pipeline de indexacion y utilidades de chunking.
+- `app/scripts/`: Entrypoints operativos (ej: reindex).
+- `app/sql/`: Scripts SQL de schema.
+
 ## Fase 1 (RAG vectorial en pgvector)
 
 Esta fase activa retrieval real sobre `pgvector` usando conocimiento de `BibliotecaProyectos`.

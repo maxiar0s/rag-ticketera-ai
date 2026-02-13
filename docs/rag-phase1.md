@@ -6,20 +6,20 @@ Reemplazar el retriever mock por retrieval semantico real usando PostgreSQL + pg
 
 ## Componentes agregados
 
-- `app/utils/vector_store.py`
+- `app/infrastructure/vector_store.py`
   - Conexion a Postgres vectorial.
   - Creacion/verificacion de schema `kb_chunks`.
   - `similarity_search` por cosine distance.
   - `upsert_chunks` para carga de conocimiento.
 
-- `app/utils/embeddings.py`
+- `app/infrastructure/embeddings.py`
   - Wrapper de embeddings con `GoogleGenerativeAIEmbeddings`.
 
-- `app/utils/chunker.py`
+- `app/indexing/chunker.py`
   - Normalizacion de texto.
   - Segmentacion con overlap para mejorar recall.
 
-- `app/utils/ingest_biblioteca.py`
+- `app/indexing/ingest_biblioteca.py`
   - Lectura de `BibliotecaProyectos` desde MySQL.
   - Extraccion por secciones.
   - Embedding + escritura en `kb_chunks`.
@@ -30,7 +30,7 @@ Reemplazar el retriever mock por retrieval semantico real usando PostgreSQL + pg
 
 ## Cambios en flujo del agente
 
-- `app/utils/nodes/retrieve.py`
+- `app/agent/nodes/retrieve.py`
   - Ahora consulta pgvector.
   - Respeta flags (`RAG_VECTOR_ENABLED`, `RAG_TOP_K`, `RAG_SCORE_THRESHOLD`).
   - Devuelve:
@@ -41,7 +41,7 @@ Reemplazar el retriever mock por retrieval semantico real usando PostgreSQL + pg
   - Inicializa/verifica schema vectorial en startup.
   - Responde `sources` desde el estado del grafo.
 
-- `app/utils/state.py`
+- `app/agent/state.py`
   - Se agrega campo `sources` al estado.
 
 ## Campos indexados de Biblioteca

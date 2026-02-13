@@ -1,4 +1,4 @@
-from app.utils.ingest_biblioteca import main
+from app.indexing.ingest_biblioteca import main
 
 
 if __name__ == "__main__":

@@ -5,10 +5,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from app.utils.chunker import chunk_text, normalize_text
+from app.indexing.chunker import chunk_text, normalize_text
 
 SOURCE_TYPE = "biblioteca_proyecto"
-STATE_PATH = Path(__file__).resolve().parents[2] / "data" / "ingest_state.json"
+STATE_PATH = Path(__file__).resolve().parents[1] / "data" / "ingest_state.json"
 
 
 def _load_state() -> Dict[str, Any]:
@@ -75,7 +75,7 @@ def _extract_sections(row: Dict[str, Any]) -> List[Dict[str, str]]:
 
 
 def _fetch_biblioteca_rows(since: Optional[datetime]) -> List[Dict[str, Any]]:
-    from app.utils.database import get_db_connection
+    from app.infrastructure.mysql import get_db_connection
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -151,8 +151,8 @@ def _build_chunks_for_project(
 def run_ingest(
     full_reindex: bool, chunk_size: int = 900, overlap: int = 150
 ) -> Dict[str, Any]:
-    from app.utils.embeddings import EmbeddingService
-    from app.utils.vector_store import VectorStore
+    from app.infrastructure.embeddings import EmbeddingService
+    from app.infrastructure.vector_store import VectorStore
 
     vector_store = VectorStore()
     embedding_service = EmbeddingService()
@@ -192,13 +192,12 @@ def run_ingest(
     state["biblioteca_last_sync_at"] = now_iso
     _save_state(state)
 
-    result = {
+    return {
         "processed_projects": processed_projects,
         "stored_chunks": stored_chunks,
         "full_reindex": full_reindex,
         "last_sync_at": now_iso,
     }
-    return result
 
 
 def main():

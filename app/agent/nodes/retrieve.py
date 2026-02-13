@@ -1,8 +1,8 @@
 import os
 
-from app.utils.embeddings import EmbeddingService
-from app.utils.state import AgentState
-from app.utils.vector_store import VectorStore
+from app.agent.state import AgentState
+from app.infrastructure.embeddings import EmbeddingService
+from app.infrastructure.vector_store import VectorStore
 
 
 def _is_vector_enabled() -> bool:
@@ -15,9 +15,6 @@ def _is_vector_enabled() -> bool:
 
 
 def retrieve_node(state: AgentState):
-    """
-    Recupera contexto técnico desde pgvector.
-    """
     print("--- 🔍 NODE: RETRIEVE ---", flush=True)
     if not state["messages"]:
         return {"documents": [], "sources": []}

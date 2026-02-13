@@ -1,20 +1,15 @@
 from langchain_core.messages import SystemMessage
-from app.utils.state import AgentState
 
-# Importamos la configuración del modelo desde el archivo hermano
-from .llm_config import llm
+from app.agent.nodes.llm_config import llm
+from app.agent.state import AgentState
 
 
 def generate_node(state: AgentState):
-    """
-    Genera respuesta usando Gemini + Contexto
-    """
     print("--- 🧠 NODE: GENERATE (LLM) ---")
 
     docs_text = "\n".join(state["documents"])
     messages = state["messages"]
 
-    # Prompt del sistema reforzado para forzar el uso de herramientas
     system_prompt = SystemMessage(
         content=f"""
     Eres un Agente de Soporte Técnico experto. Tienes acceso a una base de datos SQL mediante herramientas.
@@ -32,12 +27,9 @@ def generate_node(state: AgentState):
     """
     )
 
-    # Invocamos al modelo con el prompt de sistema + historial de mensajes
     response = llm.invoke([system_prompt] + messages)
 
-    # --- LOGGING DE DEPURACIÓN ---
     print(f"🔍 DEBUG - LLM Response Content: {response.content}")
     print(f"🛠️ DEBUG - LLM Tool Calls: {response.tool_calls}")
-    # -----------------------------
 
     return {"messages": [response], "final_response": response.content}

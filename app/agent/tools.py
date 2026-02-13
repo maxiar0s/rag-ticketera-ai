@@ -1,12 +1,12 @@
-# app/utils/tools.py
 from langchain_core.tools import tool
-from app.utils.database import get_db_connection
+
+from app.infrastructure.mysql import get_db_connection
 
 
 @tool
 def consultar_mis_tickets(user_id: int):
     """
-    Consulta la base de datos SQL para encontrar los tickets asignados a un usuario específico.
+    Consulta la base de datos SQL para encontrar los tickets asignados a un usuario especifico.
     Retorna una lista con el ID, asunto, estado y prioridad de los tickets activos.
     """
     print(f"--- 🛠️ TOOL EJECUTADA CON ID: {user_id} ---", flush=True)
@@ -15,19 +15,17 @@ def consultar_mis_tickets(user_id: int):
     if conn is None:
         return "Error al consultar la base de datos: conexión no disponible"
     try:
-        # dictionary=True devuelve resultados como JSONs {'columna': valor}
         cursor = conn.cursor(dictionary=True)
 
-        # Seleccionamos las columnas correctas basándonos en el esquema de "Tickets"
         query = """
-        SELECT 
-            id, 
-            titulo as subject, 
-            estadoTicket as status, 
-            prioridad as priority, 
+        SELECT
+            id,
+            titulo as subject,
+            estadoTicket as status,
+            prioridad as priority,
             createdAt as created_at
-        FROM Tickets 
-        WHERE tecnicoAsignadoId = %s 
+        FROM Tickets
+        WHERE tecnicoAsignadoId = %s
         AND estadoTicket IN ('Nuevo', 'Abierto', 'En espera', 'Pendiente', 'En Progreso')
         ORDER BY prioridad DESC, createdAt ASC;
         """
@@ -40,7 +38,7 @@ def consultar_mis_tickets(user_id: int):
 
         return results
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return f"Error al consultar la base de datos: {e}"
     finally:
         if cursor is not None:
