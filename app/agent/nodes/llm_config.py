@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, List
 
-from app.utils.tools import consultar_mis_tickets
+from app.agent.tools import consultar_mis_tickets
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 
@@ -49,13 +49,8 @@ class FallbackLLM:
 
             try:
                 response = candidate.client.invoke(messages)
-                # Mantener el proveedor exitoso para la siguiente invocación.
-                # Solo cambiamos de proveedor cuando hay error/rate-limit.
                 self._cursor = idx
-                print(
-                    f"✅ LLM provider activo: {candidate.provider}",
-                    flush=True,
-                )
+                print(f"✅ LLM provider activo: {candidate.provider}", flush=True)
                 return response
             except Exception as exc:  # noqa: BLE001
                 errors.append(f"{candidate.provider}: {exc}")
