@@ -8,4 +8,5 @@ psycopg[binary,pool]
 pgvector
 python-dotenv
 langchain-google-genai
+langchain-openai
 mysql-connector-python
