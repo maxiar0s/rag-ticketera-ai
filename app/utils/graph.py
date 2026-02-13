@@ -1,7 +1,8 @@
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode, tools_condition
 from app.utils.state import AgentState
-from app.utils.nodes import retrieve_node, generate_node
+from app.utils.nodes.retrieve import retrieve_node
+from app.utils.nodes.generate import generate_node
 from app.utils.tools import consultar_mis_tickets
 
 # 1. Definimos el grafo
@@ -22,7 +23,7 @@ workflow.add_edge("retriever", "generator")
 
 # Generator -> CONDICIONAL (Aquí el guardia decide: ¿Tools o END?)
 workflow.add_conditional_edges(
-    "generator",      # Origen
+    "generator",  # Origen
     tools_condition,  # La lógica (Si hay tool -> "tools", si no -> END)
 )
 
