@@ -19,15 +19,10 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - .env.local
     environment:
       # 1. ESTA LÍNEA TE DEJA VER LOS LOGS
       - PYTHONUNBUFFERED=1
-      # Conexión interna de Docker
-      - POSTGRES_HOST=vector-db
-      - POSTGRES_USER=rag_user
-      # 2. CORREGIDO: Debe coincidir con la DB del servicio vector-db
-      - POSTGRES_DB=rag_knowledge_base
     depends_on:
       - vector-db
     networks:

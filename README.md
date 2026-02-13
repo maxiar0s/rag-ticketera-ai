@@ -24,12 +24,25 @@ Esta fase activa retrieval real sobre `pgvector` usando conocimiento de `Bibliot
 
 ## Variables de entorno relevantes
 
+Para Docker local, el compose carga `rag-ticketera-ai/.env.local`.
+
 - `RAG_VECTOR_ENABLED=true`
 - `RAG_TOP_K=8`
 - `RAG_SCORE_THRESHOLD=0.2`
-- `RAG_EMBED_PROVIDER=google`
+- `RAG_EMBED_PROVIDER=auto` (o `google|openrouter|nvidia|mistral`)
+- `RAG_EMBED_PROVIDER_ORDER=google,openrouter,nvidia,mistral`
 - `GOOGLE_API_KEY=<tu_key>`
 - `GOOGLE_EMBEDDING_MODEL=models/text-embedding-004`
+- `GOOGLE_EMBEDDING_FALLBACKS=models/text-embedding-004,text-embedding-004`
+- `OPENROUTER_API_KEY=<tu_key>`
+- `OPENROUTER_EMBEDDING_MODEL=text-embedding-3-small`
+- `OPENROUTER_EMBEDDING_FALLBACKS=text-embedding-3-small`
+- `NVIDIA_API_KEY=<tu_key>`
+- `NVIDIA_EMBEDDING_MODEL=nvidia/nv-embedqa-e5-v5`
+- `NVIDIA_EMBEDDING_FALLBACKS=nvidia/nv-embedqa-e5-v5`
+- `MISTRAL_API_KEY=<tu_key>`
+- `MISTRAL_EMBEDDING_MODEL=mistral-embed`
+- `MISTRAL_EMBEDDING_FALLBACKS=mistral-embed`
 - `RAG_EMBED_DIM=768`
 
 Postgres vectorial:

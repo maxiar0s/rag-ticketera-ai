@@ -84,6 +84,10 @@ python -m app.scripts.reindex_kb
 - `Falta GOOGLE_API_KEY para embeddings`:
   - Definir `GOOGLE_API_KEY` en `.env` del backend RAG.
 
+- `404 NOT_FOUND` en embedding model:
+  - Definir `GOOGLE_EMBEDDING_MODEL=models/embedding-001`.
+  - Opcional: configurar `GOOGLE_EMBEDDING_FALLBACKS` para fallback automático.
+
 - `Retrieval chunks: 0`:
   - Ejecutar `--full-reindex`.
   - Revisar `RAG_SCORE_THRESHOLD` (bajarlo temporalmente a `0.1`).
