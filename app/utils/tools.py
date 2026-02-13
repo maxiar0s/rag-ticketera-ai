@@ -2,6 +2,7 @@
 from langchain_core.tools import tool
 from app.utils.database import get_db_connection
 
+
 @tool
 def consultar_mis_tickets(user_id: int):
     """
@@ -10,10 +11,13 @@ def consultar_mis_tickets(user_id: int):
     """
     print(f"--- 🛠️ TOOL EJECUTADA CON ID: {user_id} ---", flush=True)
     conn = get_db_connection()
+    cursor = None
+    if conn is None:
+        return "Error al consultar la base de datos: conexión no disponible"
     try:
         # dictionary=True devuelve resultados como JSONs {'columna': valor}
-        cursor = conn.cursor(dictionary=True) 
-        
+        cursor = conn.cursor(dictionary=True)
+
         # Seleccionamos las columnas correctas basándonos en el esquema de "Tickets"
         query = """
         SELECT 
@@ -24,21 +28,22 @@ def consultar_mis_tickets(user_id: int):
             createdAt as created_at
         FROM Tickets 
         WHERE tecnicoAsignadoId = %s 
-        AND estadoTicket IN ('Nuevo', 'En Progreso', 'Pendiente')
+        AND estadoTicket IN ('Nuevo', 'Abierto', 'En espera', 'Pendiente', 'En Progreso')
         ORDER BY prioridad DESC, createdAt ASC;
         """
-        
+
         cursor.execute(query, (user_id,))
         results = cursor.fetchall()
-        
+
         if not results:
             return "No se encontraron tickets activos asignados a este usuario."
-            
+
         return results
-        
+
     except Exception as e:
         return f"Error al consultar la base de datos: {e}"
     finally:
-        if conn and conn.is_connected():
+        if cursor is not None:
             cursor.close()
+        if conn and conn.is_connected():
             conn.close()
