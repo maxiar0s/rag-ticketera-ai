@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
+.env.local
 .venv/
 .DS_Store
 docker-compose.yaml
