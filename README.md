@@ -44,6 +44,7 @@ Para Docker local, el compose carga `rag-ticketera-ai/.env.local`.
 - `MISTRAL_EMBEDDING_MODEL=mistral-embed`
 - `MISTRAL_EMBEDDING_FALLBACKS=mistral-embed`
 - `RAG_EMBED_DIM=768`
+- `RAG_SYNC_WEBHOOK_SECRET=<secreto_compartido_para_webhook_sync>`
 
 Postgres vectorial:
 
@@ -78,6 +79,29 @@ python -m app.scripts.reindex_kb
 Estado de sync incremental:
 
 - `app/data/ingest_state.json`
+
+## Webhook de sincronizacion automatica
+
+El microservicio expone un endpoint para disparar sincronizacion de la base
+vectorial cuando cambian registros de Biblioteca.
+
+Endpoint:
+
+- `POST /kb/sync`
+- Header requerido: `X-WEBHOOK-SECRET: <RAG_SYNC_WEBHOOK_SECRET>`
+
+Payload soportado:
+
+- `{"action":"incremental"}`
+- `{"action":"full_reindex"}`
+- `{"action":"upsert","project_id":123}`
+- `{"action":"delete","project_id":123}`
+
+Notas:
+
+- El endpoint responde inmediato (`accepted: true`) y ejecuta la ingesta en background.
+- `upsert` y `delete` requieren `project_id`.
+- Si `RAG_SYNC_WEBHOOK_SECRET` no se define, se usa `RAG_API_KEY` como fallback.
 
 ## Esquema vectorial
 
