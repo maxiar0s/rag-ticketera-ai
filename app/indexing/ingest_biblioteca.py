@@ -100,6 +100,24 @@ def _fetch_biblioteca_rows(since: Optional[datetime]) -> List[Dict[str, Any]]:
     return rows
 
 
+def _fetch_biblioteca_row_by_id(project_id: int) -> Optional[Dict[str, Any]]:
+    from app.infrastructure.mysql import get_db_connection
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT id, casaMatrizId, categoriaId, nombre, descripcion, contenido, "
+        "linkRepositorio, instruccionesInstalacion, instruccionesProd, manualUsuario, "
+        "notasTecnicas, updatedAt "
+        "FROM BibliotecaProyectos WHERE id = %s",
+        (project_id,),
+    )
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return row
+
+
 def _build_chunks_for_project(
     row: Dict[str, Any],
     embedding_service,
@@ -140,6 +158,9 @@ def _build_chunks_for_project(
             )
             texts.append(piece)
             chunk_index += 1
+
+    if not texts:
+        return []
 
     embeddings = embedding_service.embed_documents(texts)
     for payload, embedding in zip(chunk_payloads, embeddings):
@@ -197,6 +218,57 @@ def run_ingest(
         "stored_chunks": stored_chunks,
         "full_reindex": full_reindex,
         "last_sync_at": now_iso,
+    }
+
+
+def run_ingest_for_project(
+    project_id: int, chunk_size: int = 900, overlap: int = 150
+) -> Dict[str, Any]:
+    from app.infrastructure.embeddings import EmbeddingService
+    from app.infrastructure.vector_store import VectorStore
+
+    vector_store = VectorStore()
+    embedding_service = EmbeddingService()
+
+    vector_store.ensure_schema()
+    row = _fetch_biblioteca_row_by_id(project_id)
+
+    if not row:
+        vector_store.delete_source_chunks(SOURCE_TYPE, project_id)
+        return {
+            "project_id": project_id,
+            "processed_projects": 0,
+            "stored_chunks": 0,
+            "deleted_only": True,
+        }
+
+    chunks = _build_chunks_for_project(
+        row=row,
+        embedding_service=embedding_service,
+        chunk_size=chunk_size,
+        overlap=overlap,
+    )
+    vector_store.delete_source_chunks(SOURCE_TYPE, project_id)
+    vector_store.upsert_chunks(chunks)
+
+    return {
+        "project_id": project_id,
+        "processed_projects": 1,
+        "stored_chunks": len(chunks),
+        "deleted_only": False,
+    }
+
+
+def delete_project_from_index(project_id: int) -> Dict[str, Any]:
+    from app.infrastructure.vector_store import VectorStore
+
+    vector_store = VectorStore()
+    vector_store.ensure_schema()
+    vector_store.delete_source_chunks(SOURCE_TYPE, project_id)
+
+    return {
+        "project_id": project_id,
+        "deleted": True,
     }
 
 
