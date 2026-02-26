@@ -50,6 +50,9 @@ async def verify_sync_secret(x_webhook_secret: str = Header(default="")):
 class TicketRequest(BaseModel):
     subject: str
     content: str
+    user_id: Optional[int] = None
+    channel_user_id: Optional[str] = None
+    conversation_id: Optional[str] = None
 
 
 class KBSyncRequest(BaseModel):
@@ -121,16 +124,30 @@ async def process_ticket(ticket: TicketRequest):
     message_content = f"Asunto: {ticket.subject}\nContenido: {ticket.content}"
 
     # 2. Preparamos el estado inicial con las llaves EXACTAS que espera utils.py
+    resolved_conversation_id = (
+        ticket.conversation_id
+        or (f"channel_{ticket.channel_user_id}" if ticket.channel_user_id else None)
+        or (f"user_{ticket.user_id}" if ticket.user_id else None)
+        or "anon"
+    )
+
     inputs = {
         "messages": [HumanMessage(content=message_content)],
         "documents": [],
         "sources": [],
+        "complexity_tier": "medium",
+        "user_id": ticket.user_id,
+        "channel_user_id": ticket.channel_user_id,
+        "conversation_id": resolved_conversation_id,
         "final_response": "",
     }
 
     # 3. Invocamos el grafo
     print("🤖 Enviando ticket al cerebro...")
-    result = await utils_app.ainvoke(inputs)
+    result = await utils_app.ainvoke(
+        inputs,
+        config={"configurable": {"thread_id": resolved_conversation_id}},
+    )
 
     # 4. Devolvemos solo lo que existe en el resultado
     return {"solution": result["final_response"], "sources": result.get("sources", [])}

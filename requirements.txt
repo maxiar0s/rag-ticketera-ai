@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 pydantic
 langgraph
+langgraph-checkpoint-postgres
 langchain
 langchain-core
 psycopg[binary,pool]
