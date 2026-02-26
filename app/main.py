@@ -29,6 +29,7 @@ api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
 MEMORY_SCOPE = os.getenv("RAG_MEMORY_SCOPE", "conversation").strip().lower()
 
 
+
 async def verify_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY_SECRET:
         return api_key
@@ -112,6 +113,51 @@ def _run_sync_job(payload: KBSyncRequest):
         print(f"[KB Sync] Job completado: {result}", flush=True)
     except Exception as exc:  # noqa: BLE001
         print(f"[KB Sync] Error en job: {exc}", flush=True)
+
+
+class KBSyncRequest(BaseModel):
+    action: Literal["incremental", "full_reindex", "upsert", "delete"] = "incremental"
+    project_id: Optional[int] = None
+    chunk_size: int = 900
+    overlap: int = 150
+    triggered_by: str = "unknown"
+
+
+def _run_sync_job(payload: KBSyncRequest):
+    print(
+        f"[KB Sync] Iniciando job action={payload.action} project_id={payload.project_id} triggered_by={payload.triggered_by}",
+        flush=True,
+    )
+    try:
+        if payload.action == "upsert":
+            if payload.project_id is None:
+                raise ValueError("project_id es requerido para action=upsert")
+            result = run_ingest_for_project(
+                project_id=payload.project_id,
+                chunk_size=payload.chunk_size,
+                overlap=payload.overlap,
+            )
+        elif payload.action == "delete":
+            if payload.project_id is None:
+                raise ValueError("project_id es requerido para action=delete")
+            result = delete_project_from_index(project_id=payload.project_id)
+        elif payload.action == "full_reindex":
+            result = run_ingest(
+                full_reindex=True,
+                chunk_size=payload.chunk_size,
+                overlap=payload.overlap,
+            )
+        else:
+            result = run_ingest(
+                full_reindex=False,
+                chunk_size=payload.chunk_size,
+                overlap=payload.overlap,
+            )
+
+        print(f"[KB Sync] Job completado: {result}", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[KB Sync] Error en job: {exc}", flush=True)
+
 
 
 class KBSyncRequest(BaseModel):
