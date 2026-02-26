@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, List
 
-from app.agent.tools import consultar_mis_tickets
+from app.agent.tools import ALL_TOOLS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 
@@ -212,5 +212,5 @@ class TieredLLMRouter:
 
 
 _factory = FallbackLLMFactory()
-llm = _factory.bind_tools([consultar_mis_tickets], tier="medium")
-llm_router = TieredLLMRouter(_factory, [consultar_mis_tickets])
+llm = _factory.bind_tools(ALL_TOOLS, tier="medium")
+llm_router = TieredLLMRouter(_factory, ALL_TOOLS)
