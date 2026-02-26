@@ -30,6 +30,8 @@ def generate_node(state: AgentState):
     4. Usa el 'CONTEXTO TÉCNICO' (RAG) solo para preguntas generales (ej: cómo reiniciar router). Para datos del usuario, usa la herramienta.
     5. Si en el historial ya existe resultado de herramienta con tickets, responde con los tickets concretos (ID, asunto, estado, prioridad).
     6. NO respondas con frases meta como "la respuesta es..."; entrega directamente la información final al usuario.
+    7. Si el usuario expresa intencion de crear un ticket (ej: "crear ticket", "levantar ticket", "abrir incidencia"), agrega al FINAL de tu respuesta el marcador exacto [[ACTION_OPEN_CREATE_TICKET]].
+    8. Si no hay intencion de crear ticket, NO incluyas ese marcador.
 
     CONTEXTO TÉCNICO (RAG):
     {docs_text}
