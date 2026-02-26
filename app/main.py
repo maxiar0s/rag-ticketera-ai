@@ -26,6 +26,7 @@ from app.indexing.ingest_biblioteca import (
 API_KEY_SECRET = os.getenv("RAG_API_KEY", "dev_secret")
 SYNC_WEBHOOK_SECRET = os.getenv("RAG_SYNC_WEBHOOK_SECRET", API_KEY_SECRET)
 api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
+MEMORY_SCOPE = os.getenv("RAG_MEMORY_SCOPE", "conversation").strip().lower()
 
 
 async def verify_api_key(api_key: str = Security(api_key_header)):
@@ -61,6 +62,20 @@ class KBSyncRequest(BaseModel):
     chunk_size: int = 900
     overlap: int = 150
     triggered_by: str = "unknown"
+
+
+def _resolve_conversation_id(ticket: TicketRequest) -> str:
+    # Scope "user": comparte memoria entre canales si el user_id backend coincide.
+    if MEMORY_SCOPE == "user" and ticket.user_id:
+        return f"user_{ticket.user_id}"
+
+    # Scope por conversación/canal (default).
+    return (
+        ticket.conversation_id
+        or (f"channel_{ticket.channel_user_id}" if ticket.channel_user_id else None)
+        or (f"user_{ticket.user_id}" if ticket.user_id else None)
+        or "anon"
+    )
 
 
 def _run_sync_job(payload: KBSyncRequest):
@@ -124,12 +139,7 @@ async def process_ticket(ticket: TicketRequest):
     message_content = f"Asunto: {ticket.subject}\nContenido: {ticket.content}"
 
     # 2. Preparamos el estado inicial con las llaves EXACTAS que espera utils.py
-    resolved_conversation_id = (
-        ticket.conversation_id
-        or (f"channel_{ticket.channel_user_id}" if ticket.channel_user_id else None)
-        or (f"user_{ticket.user_id}" if ticket.user_id else None)
-        or "anon"
-    )
+    resolved_conversation_id = _resolve_conversation_id(ticket)
 
     inputs = {
         "messages": [HumanMessage(content=message_content)],
