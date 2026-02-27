@@ -2,18 +2,24 @@ from datetime import datetime
 
 from langchain_core.tools import tool
 
-from app.agent.tools.db_common import VALID_PRIORITIES, VALID_SOURCES, run_query, run_write
+from app.agent.tools.db_common import (
+    VALID_PRIORITIES,
+    VALID_SOURCES,
+    resolve_default_ia_client_id,
+    run_query,
+    run_write,
+)
 
 
 @tool
 def crear_ticket_soporte(
     user_id: int,
-    casa_matriz_id: str,
     descripcion: str,
+    casa_matriz_id: str = "",
     titulo: str = "",
     prioridad: str = "Media",
     sucursal_id: str = "",
-    fuente: str = "Web",
+    fuente: str = "Agente IA",
 ):
     """
     Crea un ticket en estado Nuevo.
@@ -28,8 +34,16 @@ def crear_ticket_soporte(
         return "No puedo crear ticket: user_id no disponible."
 
     cliente_id = (casa_matriz_id or "").strip()
+    default_client_used = False
     if not cliente_id:
-        return "Falta casa_matriz_id para crear el ticket."
+        cliente_id = resolve_default_ia_client_id() or ""
+        default_client_used = bool(cliente_id)
+
+    if not cliente_id:
+        return (
+            "Falta casa_matriz_id para crear el ticket y no encontré cliente por defecto IA. "
+            "Configura RAG_DEFAULT_IA_CLIENT_ID o crea Casa Matriz 'Agente AI'."
+        )
 
     descripcion_limpia = (descripcion or "").strip()
     if len(descripcion_limpia) < 5:
@@ -39,9 +53,9 @@ def crear_ticket_soporte(
     if prioridad_limpia not in VALID_PRIORITIES:
         prioridad_limpia = "Media"
 
-    fuente_limpia = (fuente or "Web").strip()
+    fuente_limpia = (fuente or "Agente IA").strip()
     if fuente_limpia not in VALID_SOURCES:
-        fuente_limpia = "Web"
+        fuente_limpia = "Agente IA"
 
     try:
         cliente = run_query(
@@ -122,6 +136,7 @@ def crear_ticket_soporte(
             "prioridad": prioridad_limpia,
             "fuente": fuente_limpia,
             "cliente": cliente[0],
+            "default_client_used": default_client_used,
         }
     except Exception as exc:  # noqa: BLE001
         return f"Error creando ticket: {exc}"
