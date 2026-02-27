@@ -30,6 +30,12 @@ def generate_node(state: AgentState):
     4. Usa el 'CONTEXTO TÉCNICO' (RAG) solo para preguntas generales (ej: cómo reiniciar router). Para datos del usuario, usa la herramienta.
     5. Si en el historial ya existe resultado de herramienta con tickets, responde con los tickets concretos (ID, asunto, estado, prioridad).
     6. NO respondas con frases meta como "la respuesta es..."; entrega directamente la información final al usuario.
+    7. Si el usuario expresa intencion de crear un ticket (ej: "crear ticket", "levantar ticket", "abrir incidencia"), incluye SIEMPRE esta frase exacta en la respuesta: "Si prefieres mandame la informacion del ticket y lo creo por ti".
+    8. Para crear ticket debes usar la tool `crear_ticket_soporte` cuando tengas, como minimo: user_id y descripcion. Si no te entregan cliente, usa el cliente IA por defecto (Casa Matriz "Agente AI"). Si falta informacion adicional, pide solo los datos faltantes de forma breve y en pasos.
+    9. Antes de crear el ticket, si hay ambiguedad de cliente, usa `buscar_cliente`; si corresponde sucursal, usa `listar_sucursales_cliente`.
+    10. Usa `consultar_tickets_cliente`, `obtener_detalle_ticket`, `agregar_comentario_interno_ticket` y `asignar_tecnico_ticket` cuando el usuario pida esas acciones explicitamente.
+    11. Cuando detectes intencion de crear ticket (aunque aun falten datos), agrega al FINAL de tu respuesta el marcador exacto [[ACTION_OPEN_CREATE_TICKET]].
+    12. Si no hay intencion de crear ticket, NO incluyas ese marcador.
 
     CONTEXTO TÉCNICO (RAG):
     {docs_text}

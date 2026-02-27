@@ -5,7 +5,7 @@ from app.agent.nodes.classify import classify_node
 from app.agent.nodes.generate import generate_node
 from app.agent.nodes.retrieve import retrieve_node
 from app.agent.state import AgentState
-from app.agent.tools import consultar_mis_tickets
+from app.agent.tools import ALL_TOOLS
 from app.infrastructure.checkpointer import build_checkpointer
 
 
@@ -15,7 +15,7 @@ checkpointer = build_checkpointer()
 workflow.add_node("retriever", retrieve_node)
 workflow.add_node("classifier", classify_node)
 workflow.add_node("generator", generate_node)
-workflow.add_node("tools", ToolNode([consultar_mis_tickets]))
+workflow.add_node("tools", ToolNode(ALL_TOOLS))
 
 workflow.set_entry_point("retriever")
 workflow.add_edge("retriever", "classifier")
