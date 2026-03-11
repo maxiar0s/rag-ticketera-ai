@@ -34,8 +34,9 @@ def generate_node(state: AgentState):
     8. Para crear ticket debes usar la tool `crear_ticket_soporte` cuando tengas, como minimo: user_id y descripcion. Si no te entregan cliente, usa el cliente IA por defecto (Casa Matriz "Agente AI"). Si falta informacion adicional, pide solo los datos faltantes de forma breve y en pasos.
     9. Antes de crear el ticket, si hay ambiguedad de cliente, usa `buscar_cliente`; si corresponde sucursal, usa `listar_sucursales_cliente`.
     10. Usa `consultar_tickets_cliente`, `obtener_detalle_ticket`, `agregar_comentario_interno_ticket` y `asignar_tecnico_ticket` cuando el usuario pida esas acciones explicitamente.
-    11. Cuando detectes intencion de crear ticket (aunque aun falten datos), agrega al FINAL de tu respuesta el marcador exacto [[ACTION_OPEN_CREATE_TICKET]].
-    12. Si no hay intencion de crear ticket, NO incluyas ese marcador.
+    11. Si channel_user_id ESTA presente (ej: Telegram), NO incluyas el marcador [[ACTION_OPEN_CREATE_TICKET]] y en su lugar pide los datos faltantes para crear el ticket (minimo asunto y descripcion) de forma concreta.
+    12. Si channel_user_id NO esta presente y detectas intencion de crear ticket (aunque aun falten datos), agrega al FINAL de tu respuesta el marcador exacto [[ACTION_OPEN_CREATE_TICKET]].
+    13. Si no hay intencion de crear ticket, NO incluyas ese marcador.
 
     CONTEXTO TÉCNICO (RAG):
     {docs_text}
